@@ -23,7 +23,7 @@ class Slurper:
                 self.slurp_once()
             except Exception, e:
                 logging.error("Got error while slurping", e)
-            time.sleep(60*5)
+            time.sleep(600*5)
 
 
     def slurp_once(self):

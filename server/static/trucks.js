@@ -4,7 +4,7 @@ truckApp.controller('TruckAppController', function($scope) {
     // the list of known vehicles for a specific route
     var busses = {};
 
-    var socket = io.connect('http://localhost:5000');
+    var socket = io.connect(window.location.href.substring(0, window.location.href.indexOf('/', 8)));
     socket.on('init', function(msg) {
         $scope.busses = msg.busses;
         $scope.$apply();

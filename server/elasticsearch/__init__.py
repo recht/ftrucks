@@ -14,7 +14,7 @@ class ElasticSearch:
     def __init__(self, config, type):
         hostname = config.get('ESHOST')
         index = config.get('ESINDEX')
-        self.url = "http://{}/{}".format(hostname, index)
+        self.url = "{}/{}".format(hostname, index)
         logging.info("Ensuring index at %s", self.url)
         self.__ensure()
         self.type = type

@@ -1,1 +1,1 @@
-web: gunicorn --worker-class socketio.sgunicorn.GeventSocketIOWorker runp-heroku:app
+web: gunicorn runp-heroku:app

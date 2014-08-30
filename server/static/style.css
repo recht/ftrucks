@@ -1,0 +1,15 @@
+body {
+    font-family: helvetica
+}
+.busses {
+    position: absolute;
+    top: 19px;
+    left: 65px;
+}
+
+#popup {
+    width: 130px;
+    padding: 1em;
+    background-color: white;
+    font-size: 90%;
+}

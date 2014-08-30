@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html ng-app="truckApp">
+<head>
+    <link rel="stylesheet" href="http://openlayers.org/en/v3.0.0/css/ol.css" type="text/css">
+    <link rel="stylesheet" href="style.css" type="text/css">
+    <script src="//cdnjs.cloudflare.com/ajax/libs/lodash.js/2.4.1/lodash.js"></script>
+    <script src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/0.9.16/socket.io.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/angular.js/1.2.20/angular.min.js"></script>
+    <script src="http://openlayers.org/en/v3.0.0/build/ol.js" type="text/javascript"></script>
+    <script src="trucks.js"></script>
+    <title>The Truck Tracker</title>
+
+</head>
+<body ng-controller="TruckAppController">
+
+    <div id="map">
+        <div id="popup"></div>
+    </div>
+    <div class="busses" ng-show="busses">
+        <div>Select your bus</div>
+        <select ng-model="bus" ng-options="bus.name for bus in busses"></select>
+    </div>
+</body>
+</html>

@@ -3,5 +3,3 @@ import logging
 
 root = logging.getLogger()
 root.setLevel(logging.DEBUG)
-
-socketio.run(app)

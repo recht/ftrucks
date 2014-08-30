@@ -6,10 +6,14 @@ from server.elasticsearch import ElasticSearch
 from slurper import Slurper
 from server import bus
 from server.bus.buswatcher import BusWatcher
+from gevent import monkey
+import logging
 
+monkey.patch_all()
 
 app = Flask(__name__)
 app.config.from_object('config.BaseConfig')
+app.logger.setLevel(logging.DEBUG)
 socketio = SocketIO(app)
 
 es = ElasticSearch(app.config, 'truck')

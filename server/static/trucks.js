@@ -1,5 +1,5 @@
 var truckApp = angular.module('truckApp', []);
-truckApp.controller('TruckAppController', function($scope) {
+truckApp.controller('TruckAppController', ['$scope', 'mapService', function($scope, mapService) {
 
     // the list of known vehicles for a specific route
     var busses = {};
@@ -18,57 +18,8 @@ truckApp.controller('TruckAppController', function($scope) {
         busses = {};
     });
 
-
-    var map = new ol.Map({
-            target: 'map',
-            layers: [
-              new ol.layer.Tile({
-                source: new ol.source.OSM({layer: 'sat'})
-              })
-            ],
-            view: new ol.View({
-              center: ol.proj.transform([-122.406615761073, 37.7854697464899], 'EPSG:4326', 'EPSG:3857'),
-              zoom: 16
-            })
-          });
-    var popup = new ol.Overlay({
-        element: document.getElementById('popup'),
-        positioning: 'bottom-center',
-        stopEvent: false,
-    });
-    map.addOverlay(popup);
-    map.on('click', function(evt) {
-        var feature = map.forEachFeatureAtPixel(evt.pixel, function(feature, layer) {
-            return feature;
-        });
-        if (feature) {
-            var geom = feature.getGeometry();
-            var coord = geom.getCoordinates();
-            popup.setPosition(coord);
-            $('#popup').html('<div class="truck-name">' + feature.get('name') + '</div><div class="truck-items">' + feature.get('items') + '</div>');
-            $scope.popupName = feature.get('name');
-            $scope.$apply();
-            $('#popup').show();
-        } else {
-            $('#popup').hide();
-
-            if (!$scope.bus) {
-                var p = new ol.geom.Point(evt.coordinate);
-                var coords = p.transform("EPSG:900913", "EPSG:4326").getCoordinates();
-                socket.emit('new-location', [{lon: coords[0], lat: coords[1]}]);
-            }
-        }
-    });
-    $(map.getViewport()).on('mousemove', function(evt) {
-        var pixel = map.getEventPixel(evt.originalEvent);
-        var hit = map.forEachFeatureAtPixel(pixel, function(feature, layer) {
-            return true;
-        });
-        if (hit) {
-            document.getElementById('map').style.cursor = 'pointer';
-        } else {
-            document.getElementById('map').style.cursor = '';
-        }
+    var map = mapService.createMap('map', $scope, function(coords) {
+         socket.emit('new-location', [coords]);
     });
 
 
@@ -83,57 +34,41 @@ truckApp.controller('TruckAppController', function($scope) {
         })
     });
 
-    var layer;
+    var truckIcon = mapService.createIcon('truck.png');
+    var busIcon = mapService.createIcon('bus.png');
+
     socket.on('new-trucks', function(msg) {
-        if (layer) {
-            map.removeLayer(layer);
-        }
-        var vector = new ol.source.Vector({});
+        var features = [];
+
         msg.forEach(function(truck) {
-            console.log(truck);
-            var f = new ol.Feature({
-                geometry: getPoint(truck.location.lon, truck.location.lat),
+            features.push({
+                lon: truck.location.lon,
+                lat: truck.location.lat,
                 name: truck.applicant,
-                items: truck.items
+                items: truck.items,
             });
-            vector.addFeature(f);
         });
-
-        layer = new ol.layer.Vector({
-            source: vector,
-            style: iconStyle
-        });
-        map.addLayer(layer);
-
+        mapService.setFeatures(map, 'trucks', truckIcon, features);
     });
 
-    var busLayer;
     socket.on('bus-located', function(msg) {
         msg.forEach(function(bus) {
             busses[bus.id] = bus;
         });
 
-        var vector = new ol.source.Vector({});
+        var features = [];
         var locations = [];
         console.log('busses', busses);
         _.values(busses).forEach(function(bus) {
             locations.push({lon: bus.lon, lat: bus.lat});
-            var f = new ol.Feature({
-                geometry: getPoint(bus.lon, bus.lat),
-                name: 'Bus route ' + bus.route,
-                items: ''
+            features.push({
+                lon: bus.lon,
+                lat: bus.lat,
+                name: bus.route,
+                items: '',
             });
-            vector.addFeature(f);
         });
-
-        if (busLayer) {
-            map.removeLayer(busLayer);
-        }
-        busLayer = new ol.layer.Vector({
-            source: vector,
-            style: busIconStyle
-        });
-        map.addLayer(busLayer);
+        mapService.setFeatures(map, 'bus', busIcon, features);
 
         socket.emit('new-location', locations);
         console.log('located', msg);
@@ -142,8 +77,4 @@ truckApp.controller('TruckAppController', function($scope) {
     // for some reason this is not triggered automatically when connecting so we emulate here to start the app
     socket.emit('connect', {});
 
-
-    function getPoint(lon, lat) {
-        return new ol.geom.Point(ol.proj.transform([parseFloat(lon), parseFloat(lat)], 'EPSG:4326', 'EPSG:3857'));
-    }
-});
+}]);

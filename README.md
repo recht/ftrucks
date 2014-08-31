@@ -37,9 +37,6 @@ Unfortunately, OpenLayers 3 is fairly new and the documentation is a little bit 
 events can sometimes be a little off. Also, just updating markers on the map apparently doesn't update the UI so right now
 all markers are removed and then added again on updates, which arguably is not the best approach.
 
-Had I had more time, I would have moved a lot of the Javascript code out of the single trucks.js file and into Angular service
-classes and only keep the event binding in the main controller class.
-
 Backend implementation
 ----------------------
 The backend is implemented in Python using Flask and Flask-SocketIO. I have no prior experience with Flask, and I mainly
@@ -68,3 +65,10 @@ the urllib module is pretty messy and doesn't really support very much.
 Tests are implemented as a mix of Flask unit tests and plain unit tests based on the context. Some of the tests use mocking
 to avoid calling external resources. All tests are written in basic BDD style and can be executed using
 ```python -m unittest discover```.
+
+Communication pattern
+---------------------
+
+As mentioned, communication between frontend and backend happens using websockets. Here is the pattern used for tracking
+routes:
+![](http://www.websequencediagrams.com/cgi-bin/cdraw?lz=RkUtPkJFOiBjb25uZWN0CkJFLT5GRTogaW5pdChyb3V0ZSBsaXN0KQoAIQhidXMtc2VsZWN0ZWQAGwYpADAFQkU6IEFkZCAALgZ0byB3YXRjaAA4BQpsb29wAFUFTmV4dFN0b3A6IFBvbGwgZm9yIHZlaGljbGUgbG9jYXRpb25zCm5vdGUgcmlnaHRvZiBCRTogUnVucyBpbiBzZXBhcmF0ZSB0aHJlYWQAgSMJYnVzLQA6BWVkKAA-CSkKZW5kAIExBUZFOiBEcmF3AGMIcyBvbiBtYXAAgUoJbmV3ADoGaW9ucwA2DEJFLT5FUzogRmluZCB0cnVja3MgbmVhcgCBIgsAgigIbmV3LQAcBigAIwYAgiwGAHMJZm9vADoJAHkG&s=roundgreen)
